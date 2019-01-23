@@ -1,0 +1,12 @@
+hash: af9be144fad071870e16515c2da94182c35918b3b147ceeace826075979b1673
+updated: 2019-01-23T12:32:15.187058766+06:00
+imports:
+- name: github.com/gorilla/mux
+  version: 08e7f807d38d6a870193019bb439056118661505
+- name: github.com/pkg/errors
+  version: ffb6e22f01932bf7ac35e0bad9be11f01d1c8685
+- name: k8s.io/client-go
+  version: e88b66d04fb772c1810357e9e0ca473f7e8bf243
+  subpackages:
+  - util/cert
+testImports: []

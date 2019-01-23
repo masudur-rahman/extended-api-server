@@ -1,0 +1,6 @@
+package: github.com/masudur-rahman/extended-api-server
+import:
+    -   package: github.com/pkg/errors
+    -   package: k8s.io/client-go
+        subpackages:
+            -   util/cert
