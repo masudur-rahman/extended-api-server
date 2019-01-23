@@ -25,7 +25,7 @@ type CertStore struct {
 }
 
 func InitCertStore(path string) (*CertStore, error) {
-	_, err := os.Stat(path)
+	_, err := os.Stat(rootDir+path)
 
 	if os.IsNotExist(err) {
 		err := os.Mkdir(rootDir+path, 0777)
