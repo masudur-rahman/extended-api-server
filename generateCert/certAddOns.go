@@ -15,7 +15,7 @@ func (store *CertStore) InitCA(prefix string) error {
 }
 
 func (store *CertStore) NewCA(prefix string) error {
-	store.prefix = prefix
+	store.Prefix = prefix
 
 	key, err := cert.NewPrivateKey()
 	if err != nil {
@@ -52,12 +52,12 @@ func (store *CertStore) createCAFromKey(key *rsa.PrivateKey) error {
 }
 
 func (store *CertStore) WriteToFile(name string, crt *x509.Certificate, key *rsa.PrivateKey) error {
-	if err := ioutil.WriteFile(store.Path+store.prefix+"-"+name+".crt", cert.EncodeCertPEM(crt), 0777); err != nil {
-		return errors.Wrapf(err, "Failed to write `%s`", store.prefix+"-"+name+".crt",)
+	if err := ioutil.WriteFile(store.Path+store.Prefix+"-"+name+".crt", cert.EncodeCertPEM(crt), 0777); err != nil {
+		return errors.Wrapf(err, "Failed to write `%s`", store.Prefix+"-"+name+".crt",)
 	}
 
-	if err := ioutil.WriteFile(store.Path+store.prefix+"-"+name+".key", cert.EncodePrivateKeyPEM(key), 0777); err != nil {
-		return errors.Wrapf(err, "Failed to write `%s`", store.prefix+"-"+name+".key",)
+	if err := ioutil.WriteFile(store.Path+store.Prefix+"-"+name+".key", cert.EncodePrivateKeyPEM(key), 0777); err != nil {
+		return errors.Wrapf(err, "Failed to write `%s`", store.Prefix+"-"+name+".key",)
 
 	}
 

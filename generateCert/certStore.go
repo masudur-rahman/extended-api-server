@@ -18,7 +18,7 @@ func init() {
 
 type CertStore struct {
 	Path	string
-	prefix	string
+	Prefix	string
 	ca		string
 	caKey	*rsa.PrivateKey
 	caCert	*x509.Certificate

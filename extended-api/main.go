@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/masudur-rahman/extended-api-server/generateCert"
@@ -43,6 +44,36 @@ func main() {
 		log.Fatalln(err)
 	}
 	err = store.WriteToFile("client", clientCert, clientKey)
+
+	//----------------------Request Header Certificate------------------------------
+
+	rhStore, err := generateCert.InitCertStore("certificates")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = rhStore.InitCA("request-header")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	rhClientCert, rhClientKey, err := rhStore.NewClientCertPair(cert.AltNames{
+		DNSNames:	[]string{"apiserver"},
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = rhStore.WriteToFile("apiserver", rhClientCert, rhClientKey)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	rhCert, err := tls.LoadX509KeyPair( rhStore.Path+rhStore.Prefix+"-"+"apiserver"+".crt", rhStore.Path+rhStore.Prefix+"-"+"apiserver"+".key",)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// ------------------------------------------------------------------
+	log.Println(rhCert)
+
+
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
