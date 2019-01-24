@@ -10,8 +10,11 @@ import (
 )
 
 func (store *CertStore) InitCA(prefix string) error {
-
-	return store.NewCA(prefix)
+	err := store.LoadCA(prefix)	
+	if err != nil {
+		return store.NewCA(prefix)
+	}
+	return err
 }
 
 func (store *CertStore) NewCA(prefix string) error {
@@ -24,6 +27,14 @@ func (store *CertStore) NewCA(prefix string) error {
 
 
 	return store.createCAFromKey(key)
+}
+
+func (store *CertStore) LoadCA(prefix string) error {
+	store.Prefix = prefix
+	//log.Println(store.ca)
+	var err error
+	store.CaCert, store.CaKey, err = store.ReadFromFile(store.ca)
+	return err
 }
 
 func (store *CertStore) createCAFromKey(key *rsa.PrivateKey) error {
@@ -45,10 +56,29 @@ func (store *CertStore) createCAFromKey(key *rsa.PrivateKey) error {
 		return err
 	}
 
-	store.caCert = crt
-	store.caKey = key
+	store.CaCert = crt
+	store.CaKey = key
 
 	return nil
+}
+
+func (store *CertStore) ReadFromFile(name string) (*x509.Certificate, *rsa.PrivateKey, error) {
+	//fmt.Println(store.Prefix)
+
+	crtBytes, err := ioutil.ReadFile(store.Path+store.Prefix+"-"+name+".crt")
+	if err != nil {
+		return nil, nil, errors.Wrapf(err,"Failed to read certificate `%s`", store.Path+store.Prefix+"-"+name+".crt")
+	}
+	crt, err := cert.ParseCertsPEM(crtBytes)
+
+	keyBytes, err := ioutil.ReadFile(store.Path+store.Prefix+"-"+name+".key")
+	if err != nil {
+		return nil, nil, errors.Wrapf(err,"Failed to read private key `%s`", store.Path+store.Prefix+"-"+name+".key")
+	}
+	key, err := cert.ParsePrivateKeyPEM(keyBytes)
+
+
+	return crt[0], key.(*rsa.PrivateKey), nil
 }
 
 func (store *CertStore) WriteToFile(name string, crt *x509.Certificate, key *rsa.PrivateKey) error {
@@ -82,7 +112,7 @@ func (store *CertStore) NewServerCertPair(alternames cert.AltNames) (*x509.Certi
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "Failed to generate private key")
 	}
-	crt, err := cert.NewSignedCert(cfg, key, store.caCert, store.caKey)
+	crt, err := cert.NewSignedCert(cfg, key, store.CaCert, store.CaKey)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "Failed to generate signed certificate")
 	}
@@ -108,7 +138,7 @@ func (store *CertStore) NewClientCertPair(alternames cert.AltNames) (*x509.Certi
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "Failed to generate private key")
 	}
-	crt, err := cert.NewSignedCert(cfg, key, store.caCert, store.caKey)
+	crt, err := cert.NewSignedCert(cfg, key, store.CaCert, store.CaKey)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "Failed to generate signed certificate")
 	}

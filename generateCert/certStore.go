@@ -20,8 +20,8 @@ type CertStore struct {
 	Path	string
 	Prefix	string
 	ca		string
-	caKey	*rsa.PrivateKey
-	caCert	*x509.Certificate
+	CaKey	*rsa.PrivateKey
+	CaCert	*x509.Certificate
 }
 
 func InitCertStore(path string) (*CertStore, error) {
